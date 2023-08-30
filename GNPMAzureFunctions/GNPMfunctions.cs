@@ -38,7 +38,7 @@ namespace GNPMAzureFunctions
         }
        
         [Function("SendRenewAgreementEmailNotification")]
-        public async Task RunAsync([TimerTrigger("0 0 4 * * *", RunOnStartup = false)] MyInfo myTimer)
+        public async Task RunAsync([TimerTrigger("0 0 5 * * *", RunOnStartup = false)] MyInfo myTimer)
         {
             List<NotificationReciever> emailNotificationReceivers = await GetNotificationReceiversFromDatabase();
             foreach (var user in emailNotificationReceivers)
@@ -48,7 +48,7 @@ namespace GNPMAzureFunctions
                 string appUrl = $"{_configuration["AppUrl"]}{user.agreementNumber}";
                 string emailContent = GenerateEmailContent(user, emailTemplate, appUrl);
                 string toMaiAddress = $"{user.createdBy},{user.salesPerson}";
-                string subject = user.status == "expired" ? _configuration["expiredAgreementSubjectLine"] : _configuration["RenewAgreementSubjectLine"];
+                string subject = user.status == expired ? _configuration["expiredAgreementSubjectLine"] : _configuration["RenewAgreementSubjectLine"];
                 Mail objMail = new Mail("taranbir.bajwa@emerson.com", toMaiAddress, "", "", "", subject, "", "", "", emailContent);
                 string objMailJsonMessage = JsonSerializer.Serialize(objMail);
 
