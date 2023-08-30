@@ -43,7 +43,7 @@ namespace GNPMAzureFunctions
             List<NotificationReciever> emailNotificationReceivers = await GetNotificationReceiversFromDatabase();
             foreach (var user in emailNotificationReceivers)
             {
-                string templatePath = user.status == "expired" ? "EmailTemplates/expiredAgreement.html" : "EmailTemplates/renewedAgreement.html";
+                string templatePath = user.status == expired ? "EmailTemplates/expiredAgreement.html" : "EmailTemplates/renewedAgreement.html";
                 string emailTemplate = File.ReadAllText(templatePath);
                 string appUrl = $"{_configuration["AppUrl"]}{user.agreementNumber}";
                 string emailContent = GenerateEmailContent(user, emailTemplate, appUrl);
