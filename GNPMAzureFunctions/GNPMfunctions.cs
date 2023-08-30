@@ -95,7 +95,8 @@ namespace GNPMAzureFunctions
                 .Replace("{3}", user.companyName)
                 .Replace("{4}", user.status)
                 .Replace("{5}", user.status)
-                .Replace("{6}", appUrl);
+                .Replace("{6}", user.salesPerson)
+                .Replace("{7}", appUrl);
         }
 
 
