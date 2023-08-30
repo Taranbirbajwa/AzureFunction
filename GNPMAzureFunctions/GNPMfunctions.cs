@@ -38,7 +38,7 @@ namespace GNPMAzureFunctions
         }
        
         [Function("SendRenewAgreementEmailNotification")]
-        public async Task RunAsync([TimerTrigger("0 0 10 * * *", RunOnStartup = false)] MyInfo myTimer)
+        public async Task RunAsync([TimerTrigger("0 0 5 * * *", RunOnStartup = false)] MyInfo myTimer)
         {
             List<NotificationReciever> emailNotificationReceivers = await GetNotificationReceiversFromDatabase();
             foreach (var user in emailNotificationReceivers)
