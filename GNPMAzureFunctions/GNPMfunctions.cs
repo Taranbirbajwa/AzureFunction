@@ -38,6 +38,8 @@ namespace GNPMAzureFunctions
         }
        
         [Function("SendRenewAgreementEmailNotification")]
+        //0 */5 * * * *
+        //0 0 5 * * *
         public async Task RunAsync([TimerTrigger("0 0 5 * * *", RunOnStartup = false)] MyInfo myTimer)
         {
             List<NotificationReciever> emailNotificationReceivers = await GetNotificationReceiversFromDatabase();
@@ -94,8 +96,8 @@ namespace GNPMAzureFunctions
                 .Replace("{2}", user.accountNumber)
                 .Replace("{3}", user.companyName)
                 .Replace("{4}", user.status)
-                .Replace("{5}", user.status)
-                .Replace("{6}", user.salesPerson)
+                .Replace("{5}", user.salesPerson)
+                .Replace("{6}", user.status)
                 .Replace("{7}", appUrl);
         }
 
