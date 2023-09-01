@@ -51,7 +51,8 @@ namespace GNPMAzureFunctions
                 string emailContent = GenerateEmailContent(user, emailTemplate, appUrl);
                 string toMaiAddress = $"{user.createdBy},{user.salesPerson}";
                 string subject = user.status == expired ? _configuration["expiredAgreementSubjectLine"] : _configuration["RenewAgreementSubjectLine"];
-                Mail objMail = new Mail("taranbir.bajwa@emerson.com", toMaiAddress, "", "", "", subject, "", "", "", emailContent);
+                string fromEmailAddress =  _configuration["FromEmailAddress"];
+                Mail objMail = new Mail(fromEmailAddress, toMaiAddress, "", "", "", subject, "", "", "", emailContent);
                 string objMailJsonMessage = JsonSerializer.Serialize(objMail);
 
                 // Enqueue the JSON message using Azure SDK
