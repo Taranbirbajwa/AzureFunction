@@ -25,7 +25,7 @@ namespace GNPMAzureFunctions
         }
 
         [Function(nameof(SendEmail))]
-        public async Task Run([QueueTrigger("emailqueue", Connection = "AzureWebJobsStorage")] string message)
+        public async Task Run([QueueTrigger("gnpmnotificationqueueprod", Connection = "AzureWebJobsStorage")] string message)
         {
             Mail? objMail = JsonSerializer.Deserialize<Mail>(message);
             var result = await _emailService.SendEmailAsync(objMail!);
