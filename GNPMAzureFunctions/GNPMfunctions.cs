@@ -38,18 +38,21 @@ namespace GNPMAzureFunctions
         }
        
         [Function("SendRenewAgreementEmailNotification")]
+        //0 */5 * * * *
+        //0 0 5 * * *
         public async Task RunAsync([TimerTrigger("0 0 5 * * *", RunOnStartup = false)] MyInfo myTimer)
         {
             List<NotificationReciever> emailNotificationReceivers = await GetNotificationReceiversFromDatabase();
             foreach (var user in emailNotificationReceivers)
             {
-                string templatePath = user.status == "expired" ? "EmailTemplates/expiredAgreement.html" : "EmailTemplates/renewedAgreement.html";
+                string templatePath = user.status == expired ? "EmailTemplates/expiredAgreement.html" : "EmailTemplates/renewedAgreement.html";
                 string emailTemplate = File.ReadAllText(templatePath);
                 string appUrl = $"{_configuration["AppUrl"]}{user.agreementNumber}";
                 string emailContent = GenerateEmailContent(user, emailTemplate, appUrl);
                 string toMaiAddress = $"{user.createdBy},{user.salesPerson}";
-                string subject = user.status == "expired" ? _configuration["expiredAgreementSubjectLine"] : _configuration["RenewAgreementSubjectLine"];
-                Mail objMail = new Mail("taranbir.bajwa@emerson.com", toMaiAddress, "", "", "", subject, "", "", "", emailContent);
+                string subject = user.status == expired ? _configuration["expiredAgreementSubjectLine"] : _configuration["RenewAgreementSubjectLine"];
+                string fromEmailAddress =  _configuration["FromEmailAddress"];
+                Mail objMail = new Mail(fromEmailAddress, toMaiAddress, "", "", "", subject, "", "", "", emailContent);
                 string objMailJsonMessage = JsonSerializer.Serialize(objMail);
 
                 // Enqueue the JSON message using Azure SDK
@@ -94,8 +97,9 @@ namespace GNPMAzureFunctions
                 .Replace("{2}", user.accountNumber)
                 .Replace("{3}", user.companyName)
                 .Replace("{4}", user.status)
-                .Replace("{5}", user.status)
-                .Replace("{6}", appUrl);
+                .Replace("{5}", user.salesPerson)
+                .Replace("{6}", user.status)
+                .Replace("{7}", appUrl);
         }
 
 
