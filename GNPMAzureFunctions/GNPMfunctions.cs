@@ -42,25 +42,35 @@ namespace GNPMAzureFunctions
         //0 0 5 * * *
         public async Task RunAsync([TimerTrigger("0 0 5 * * *", RunOnStartup = false)] MyInfo myTimer)
         {
-            List<NotificationReciever> emailNotificationReceivers = await GetNotificationReceiversFromDatabase();
-            foreach (var user in emailNotificationReceivers)
+            try
             {
-                string templatePath = user.status == expired ? "EmailTemplates/expiredAgreement.html" : "EmailTemplates/renewedAgreement.html";
-                string emailTemplate = File.ReadAllText(templatePath);
-                string appUrl = $"{_configuration["AppUrl"]}{user.agreementNumber}";
-                string emailContent = GenerateEmailContent(user, emailTemplate, appUrl);
-                string toMaiAddress = $"{user.createdBy},{user.salesPerson}";
-                string subject = user.status == expired ? _configuration["expiredAgreementSubjectLine"] : _configuration["RenewAgreementSubjectLine"];
-                string fromEmailAddress =  _configuration["FromEmailAddress"];
-                Mail objMail = new Mail(fromEmailAddress, toMaiAddress, "", "", "", subject, "", "", "", emailContent);
-                string objMailJsonMessage = JsonSerializer.Serialize(objMail);
 
-                // Enqueue the JSON message using Azure SDK
-                var connectionString = _configuration["AzureWebJobsStorage"];
-                var queueName = _configuration["QueueName"];
-                var queueClient = new QueueClient(connectionString, queueName);
-                var bytes = Encoding.UTF8.GetBytes(objMailJsonMessage);
-                await queueClient.SendMessageAsync(Convert.ToBase64String(bytes));
+                List<NotificationReciever> emailNotificationReceivers = await GetNotificationReceiversFromDatabase();
+                foreach (var user in emailNotificationReceivers)
+                {
+                    string templatePath = user.status == expired ? "EmailTemplates/expiredAgreement.html" : "EmailTemplates/renewedAgreement.html";
+                    string emailTemplate = File.ReadAllText(templatePath);
+                    string appUrl = $"{_configuration["AppUrl"]}{user.agreementNumber}";
+                    string emailContent = GenerateEmailContent(user, emailTemplate, appUrl);
+                    string toMaiAddress = $"{user.createdBy},{user.salesPerson}";
+                    string subject = user.status == expired ? _configuration["expiredAgreementSubjectLine"] : _configuration["RenewAgreementSubjectLine"];
+                    string fromEmailAddress = _configuration["FromEmailAddress"];
+                    Mail objMail = new Mail(fromEmailAddress, toMaiAddress, "", "", "", subject, "", "", "", emailContent);
+                    string objMailJsonMessage = JsonSerializer.Serialize(objMail);
+
+                    // Enqueue the JSON message using Azure SDK
+                    var connectionString = _configuration["AzureWebJobsStorage"];
+                    var queueName = _configuration["QueueName"];
+                    var queueClient = new QueueClient(connectionString, queueName);
+                    var bytes = Encoding.UTF8.GetBytes(objMailJsonMessage);
+                    await queueClient.SendMessageAsync(Convert.ToBase64String(bytes));
+                    _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now} successfully");
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred: {ex.Message}");
             }
         }
 

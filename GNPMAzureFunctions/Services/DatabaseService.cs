@@ -14,22 +14,33 @@ namespace GNPMAzureFunctions.Services
         }
         public  async Task ExecuteStoredProcedureAsync(Func<SqlCommand, Task> action, string procedureName, SqlParameter[]? parameters = null)
         {
-            //var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings:DynamicFormDB");
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            try
             {
-                await connection.OpenAsync();
-                using (SqlCommand command = connection.CreateCommand())
+                //var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings:DynamicFormDB");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.CommandText = procedureName;
-
-                    if (parameters != null)
+                    await connection.OpenAsync();
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        command.Parameters.AddRange(parameters);
-                    }
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        command.CommandText = procedureName;
 
-                    await action(command);
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        await action(command);
+                    }
                 }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+               throw; 
             }
         }
     }
