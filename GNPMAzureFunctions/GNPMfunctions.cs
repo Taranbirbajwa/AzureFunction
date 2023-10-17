@@ -40,7 +40,7 @@ namespace GNPMAzureFunctions
         [Function("SendRenewAgreementEmailNotification")]
         //0 */5 * * * *
         //0 0 5 * * *
-        public async Task RunAsync([TimerTrigger("0 0 5 * * *", RunOnStartup = false)] MyInfo myTimer)
+        public async Task RunAsync([TimerTrigger("0 30 7  * * *", RunOnStartup = false)] MyInfo myTimer)
         {
             try
             {
